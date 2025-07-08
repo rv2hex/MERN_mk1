@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import NotesCard from '../components/NoteCard';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import Footer from '../components/Footer';
+import Footer from '../components/footer';
 
 const HomePage = () => {
   const [notes, setNotes] = useState([]);
