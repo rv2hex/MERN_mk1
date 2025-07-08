@@ -3,47 +3,56 @@ import notesRoutes from "./routes/notesRoutes.js";
 import { connectDB } from "./config/db.js";
 import dotenv from "dotenv";
 import rateLimit from "./middleware/rateLimiter.js";
-import cors from "cors"
-import path from 'path'
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
+// Load environment variables
 dotenv.config();
 
-console.log(process.env.MONGO_URI);  
-const app = express();
-const PORT = process.env.PORT || 5001;   
-const __dirname =path.resolve()
+// ESM-compatible __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+// Initialize Express app
+const app = express();
+const PORT = process.env.PORT || 5001;
+
+// Connect to MongoDB
 connectDB();
 
-//middleware can be used for auth check and rate limiting!!
-
-if(process.env.NODE_ENV !== "production"){
-
+// CORS configuration
+if (process.env.NODE_ENV !== "production") {
     app.use(cors({
-        origin:"http://localhost:5173",
-    })); 
-    
+        origin: "http://localhost:5173",
+    }));
+} else {
+    app.use(cors({
+        origin: "https://yourdomain.com", // 🔁 Replace with your frontend production domain
+    }));
 }
 
-app.use(express.json());
-app.use(rateLimit)
-
-app.use((req, res, next) => {
-    console.log(`req method is ${req.method}& req URL is ${req.url}`);
+// Middleware
+app.use(express.json());           // Parse JSON bodies
+app.use(rateLimit);                // Rate limiting
+app.use((req, res, next) => {      // Request logger
+    console.log(`req method is ${req.method} & req URL is ${req.url}`);
     next();
-})
-
-app.use("/notes", notesRoutes);
-
-if(process.env.NODE_ENV === "production"){
-    app.use(express.static(path.join(__dirname,"../frontend/dist")))
-
-    app.get("*",(req, res)=>{
-        res.sendFile(path.join(__dirname,"../frontend","dist","index.html"))
 });
 
+// API Routes
+app.use("/notes", notesRoutes);
+
+// Serve static frontend in production
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+    app.get("*", (req, res) => {
+        res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
+    });
 }
 
-app.listen(5001, () => {
-    console.log("!! server is live !!");
+// Start server
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
 });
