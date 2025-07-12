@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
-import { useNavigate, useParams, Link } from 'react-router'; // ✅ Correct import
-import { ArrowLeftIcon, Trash2Icon } from 'lucide-react';
-import api from '../lib/axios'; // Assuming axios is properly configured in this file
+import { useEffect } from "react";
+import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router";
+import api from "../lib/axios";
+import toast from "react-hot-toast";
+import { ArrowLeftIcon, LoaderIcon, Trash2Icon } from "lucide-react";
 
 const NoteDetailPage = () => {
   const [note, setNote] = useState(null);
@@ -10,6 +11,7 @@ const NoteDetailPage = () => {
   const [saving, setSaving] = useState(false);
 
   const navigate = useNavigate();
+
   const { id } = useParams();
 
   useEffect(() => {
@@ -18,7 +20,7 @@ const NoteDetailPage = () => {
         const res = await api.get(`/notes/${id}`);
         setNote(res.data);
       } catch (error) {
-        console.error("Error fetching note", error);
+        console.log("Error in fetching note", error);
         toast.error("Failed to fetch the note");
       } finally {
         setLoading(false);
@@ -33,48 +35,53 @@ const NoteDetailPage = () => {
 
     try {
       await api.delete(`/notes/${id}`);
-      toast.success("Note deleted successfully");
+      toast.success("Note deleted");
       navigate("/");
     } catch (error) {
-      console.error("Error deleting note", error);
+      console.log("Error deleting the note:", error);
       toast.error("Failed to delete note");
     }
   };
 
   const handleSave = async () => {
     if (!note.title.trim() || !note.content.trim()) {
-      toast.error("Please add title and content");
+      toast.error("Please add a title or content");
       return;
     }
 
     setSaving(true);
+
     try {
       await api.put(`/notes/${id}`, note);
       toast.success("Note updated successfully");
       navigate("/");
     } catch (error) {
-      console.error("Error updating the note", error.response || error.message || error);
+      console.log("Error saving the note:", error);
       toast.error("Failed to update note");
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) return <p>Loading note...</p>;
-  if (!note) return <p>Note not found.</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-base-200 flex items-center justify-center">
+        <LoaderIcon className="animate-spin size-10" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-base-200">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
-
           <div className="flex items-center justify-between mb-6">
-            <Link to='/' className='btn btn-ghost mb-6'>
-              <ArrowLeftIcon size={20} className='mr-2' />
-              Back to Home Page
+            <Link to="/" className="btn btn-ghost">
+              <ArrowLeftIcon className="h-5 w-5" />
+              Back to Notes
             </Link>
-            <button className="btn btn-ghost btn-xs text-error" onClick={handleDelete}>
-              <Trash2Icon className="size-4" />
+            <button onClick={handleDelete} className="btn btn-error btn-outline">
+              <Trash2Icon className="h-5 w-5" />
               Delete Note
             </button>
           </div>
@@ -99,7 +106,7 @@ const NoteDetailPage = () => {
                   <span className="label-text">Content</span>
                 </label>
                 <textarea
-                  placeholder="Edit your note here"
+                  placeholder="Write your note here..."
                   className="textarea textarea-bordered h-32"
                   value={note.content}
                   onChange={(e) => setNote({ ...note, content: e.target.value })}
@@ -107,21 +114,15 @@ const NoteDetailPage = () => {
               </div>
 
               <div className="card-actions justify-end">
-                <button
-                  className="btn btn-primary"
-                  disabled={saving}
-                  onClick={handleSave}
-                >
+                <button className="btn btn-primary" disabled={saving} onClick={handleSave}>
                   {saving ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
   );
 };
-
 export default NoteDetailPage;
