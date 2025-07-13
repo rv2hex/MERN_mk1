@@ -2,7 +2,7 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="bg-base-200 text-base-content py-6 border-t text-sm">
+    <footer className="bg-base-200 text-base-content py-6 border-t-2 text-sm border-[#7480ff]">
       <div className="max-w-7xl mx-auto px-4 text-center text-sm">
         <p className="">
           🛠️ Built with the <strong>MERN Stack</strong>: MongoDB, Express.js, React, and Node.js

@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.min-h-screen{  
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;}
+
+.max-w-7xl{
+    flex: 1;
+}
