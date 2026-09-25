@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="./banner.svg" alt="BRAINDUMP banner" width="100%" />
+</div>
+
 # BrainDump — MERN Notes App
 
 A full-stack notes app: Express + MongoDB API with Upstash Redis rate
